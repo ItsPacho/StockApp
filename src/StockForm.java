@@ -2,8 +2,17 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 public class StockForm {
+
+    // UI imports
     private JComboBox dataComboBox;
     private JComboBox timeSeriesComboBox;
     private JComboBox symbolComboBox;
@@ -15,40 +24,88 @@ public class StockForm {
     private JScrollPane textAreaScroll;
 
     public StockForm() {
+
+        // ARRAY TO STORE THE STATE OF SELECTED OPTIONS
+        String[] stateArray = new String[5];
+
+        // DEFAULT VALUES
+        stateArray[0] = "open";
+        stateArray[1] = "TIME_SERIES_INTRADAY";
+        stateArray[2] = "A";
+        stateArray[3] = "1min";
+        stateArray[4] = "full";
+
         dataComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                String selectedData = (String) dataComboBox.getSelectedItem();
+                stateArray[0] = selectedData;
             }
         });
         timeSeriesComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                String selectedTimeSeries = (String) timeSeriesComboBox.getSelectedItem();
+                stateArray[1] = selectedTimeSeries;
             }
         });
         symbolComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                String selectedSymbol = (String) symbolComboBox.getSelectedItem();
+                stateArray[2] = selectedSymbol;
             }
         });
         timeIntervalComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                String selectedInterval = (String) timeIntervalComboBox.getSelectedItem();
+                stateArray[3] = selectedInterval;
             }
         });
         outputComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                String selectedOutput = (String) outputComboBox.getSelectedItem();
+                stateArray[4] = selectedOutput;
             }
         });
         doQueryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                textArea.append("Testing\n");
+
+                //////////////////////
+                URL url = null;
+                try {
+
+                    // DOING THE REQUEST
+                    url = new URL("https://www.alphavantage.co/query?function=" + stateArray[1] + "&" +
+                            "symbol=" + stateArray[2] + "&" + "interval=" + stateArray[3] +
+                            "&" + "outputsize=" + stateArray[4] + "&" + "apikey=XVT9GOFLC4DOQYGY"
+                    );
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    con.setRequestMethod("GET");
+
+                    // READING THE RESPONSE
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(con.getInputStream()));
+                    String inputLine;
+                    StringBuffer content = new StringBuffer();
+                    while ((inputLine = in.readLine()) != null) {
+                        content.append(inputLine);
+                    }
+                    in.close();
+                    con.disconnect();
+                    String JSONData = content.toString();
+                    textArea.append(JSONData);
+
+                } catch (MalformedURLException e1) {
+                    e1.printStackTrace();
+                } catch (ProtocolException protocolError) {
+                    protocolError.printStackTrace();
+                } catch (IOException IOError) {
+                    IOError.printStackTrace();
+                }
             }
         });
     }
@@ -86,11 +143,11 @@ public class StockForm {
         dataComboBox = new JComboBox();
         dataComboBox.setAutoscrolls(false);
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
-        defaultComboBoxModel1.addElement("CHOICE 1");
-        defaultComboBoxModel1.addElement("CHOICE 2");
-        defaultComboBoxModel1.addElement("CHOICE 3");
-        defaultComboBoxModel1.addElement("CHOICE 4");
-        defaultComboBoxModel1.addElement("CHOICE 5");
+        defaultComboBoxModel1.addElement("open");
+        defaultComboBoxModel1.addElement("high");
+        defaultComboBoxModel1.addElement("low");
+        defaultComboBoxModel1.addElement("close");
+        defaultComboBoxModel1.addElement("volume");
         dataComboBox.setModel(defaultComboBoxModel1);
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
@@ -101,11 +158,13 @@ public class StockForm {
         StockPanel.add(dataComboBox, gbc);
         timeSeriesComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel2 = new DefaultComboBoxModel();
-        defaultComboBoxModel2.addElement("CHOICE 1");
-        defaultComboBoxModel2.addElement("CHOICE 2");
-        defaultComboBoxModel2.addElement("CHOICE 3");
-        defaultComboBoxModel2.addElement("CHOICE 4");
-        defaultComboBoxModel2.addElement("CHOICE 5");
+        defaultComboBoxModel2.addElement("TIME_SERIES_INTRADAY");
+        defaultComboBoxModel2.addElement("TIME_SERIES_DAILY");
+        defaultComboBoxModel2.addElement("TIME_SERIES_DAILY_ADJUSTED");
+        defaultComboBoxModel2.addElement("TIME_SERIES_WEEKLY");
+        defaultComboBoxModel2.addElement("TIME_SERIES_WEEKLY_ADJUSTED");
+        defaultComboBoxModel2.addElement("TIME_SERIES_MONTHLY");
+        defaultComboBoxModel2.addElement("TIME_SERIES_MONTHLY_ADJUSTED");
         timeSeriesComboBox.setModel(defaultComboBoxModel2);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
@@ -115,11 +174,22 @@ public class StockForm {
         StockPanel.add(timeSeriesComboBox, gbc);
         symbolComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel3 = new DefaultComboBoxModel();
-        defaultComboBoxModel3.addElement("CHOICE 1");
-        defaultComboBoxModel3.addElement("CHOICE 2");
-        defaultComboBoxModel3.addElement("CHOICE 3");
-        defaultComboBoxModel3.addElement("CHOICE 4");
-        defaultComboBoxModel3.addElement("CHOICE 5");
+        defaultComboBoxModel3.addElement("A");
+        defaultComboBoxModel3.addElement("AAPL");
+        defaultComboBoxModel3.addElement("C");
+        defaultComboBoxModel3.addElement("GOOG");
+        defaultComboBoxModel3.addElement("HOG");
+        defaultComboBoxModel3.addElement("HPQ");
+        defaultComboBoxModel3.addElement("INTC");
+        defaultComboBoxModel3.addElement("KO");
+        defaultComboBoxModel3.addElement("LUV");
+        defaultComboBoxModel3.addElement("MMM");
+        defaultComboBoxModel3.addElement("MSFT");
+        defaultComboBoxModel3.addElement("T");
+        defaultComboBoxModel3.addElement("TGT");
+        defaultComboBoxModel3.addElement("TXN");
+        defaultComboBoxModel3.addElement("WMT");
+        defaultComboBoxModel3.addElement("TSLA");
         symbolComboBox.setModel(defaultComboBoxModel3);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
@@ -129,11 +199,11 @@ public class StockForm {
         StockPanel.add(symbolComboBox, gbc);
         timeIntervalComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel4 = new DefaultComboBoxModel();
-        defaultComboBoxModel4.addElement("1 MIN");
-        defaultComboBoxModel4.addElement("5 MIN");
-        defaultComboBoxModel4.addElement("15 MIN");
-        defaultComboBoxModel4.addElement("30 MIN");
-        defaultComboBoxModel4.addElement("60 MIN");
+        defaultComboBoxModel4.addElement("1min");
+        defaultComboBoxModel4.addElement("5min");
+        defaultComboBoxModel4.addElement("15min");
+        defaultComboBoxModel4.addElement("30min");
+        defaultComboBoxModel4.addElement("60min");
         timeIntervalComboBox.setModel(defaultComboBoxModel4);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
@@ -143,11 +213,8 @@ public class StockForm {
         StockPanel.add(timeIntervalComboBox, gbc);
         outputComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel5 = new DefaultComboBoxModel();
-        defaultComboBoxModel5.addElement("CHOICE 1");
-        defaultComboBoxModel5.addElement("CHOICE 2");
-        defaultComboBoxModel5.addElement("CHOICE 3");
-        defaultComboBoxModel5.addElement("CHOICE 4");
-        defaultComboBoxModel5.addElement("CHOICE 5");
+        defaultComboBoxModel5.addElement("full");
+        defaultComboBoxModel5.addElement("compact");
         outputComboBox.setModel(defaultComboBoxModel5);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;

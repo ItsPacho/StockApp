@@ -20,11 +20,11 @@
         <properties>
           <autoscrolls value="false"/>
           <model>
-            <item value="CHOICE 1"/>
-            <item value="CHOICE 2"/>
-            <item value="CHOICE 3"/>
-            <item value="CHOICE 4"/>
-            <item value="CHOICE 5"/>
+            <item value="open"/>
+            <item value="high"/>
+            <item value="low"/>
+            <item value="close"/>
+            <item value="volume"/>
           </model>
         </properties>
       </component>
@@ -35,11 +35,13 @@
         </constraints>
         <properties>
           <model>
-            <item value="CHOICE 1"/>
-            <item value="CHOICE 2"/>
-            <item value="CHOICE 3"/>
-            <item value="CHOICE 4"/>
-            <item value="CHOICE 5"/>
+            <item value="TIME_SERIES_INTRADAY"/>
+            <item value="TIME_SERIES_DAILY"/>
+            <item value="TIME_SERIES_DAILY_ADJUSTED"/>
+            <item value="TIME_SERIES_WEEKLY"/>
+            <item value="TIME_SERIES_WEEKLY_ADJUSTED"/>
+            <item value="TIME_SERIES_MONTHLY"/>
+            <item value="TIME_SERIES_MONTHLY_ADJUSTED"/>
           </model>
         </properties>
       </component>
@@ -50,11 +52,22 @@
         </constraints>
         <properties>
           <model>
-            <item value="CHOICE 1"/>
-            <item value="CHOICE 2"/>
-            <item value="CHOICE 3"/>
-            <item value="CHOICE 4"/>
-            <item value="CHOICE 5"/>
+            <item value="A"/>
+            <item value="AAPL"/>
+            <item value="C"/>
+            <item value="GOOG"/>
+            <item value="HOG"/>
+            <item value="HPQ"/>
+            <item value="INTC"/>
+            <item value="KO"/>
+            <item value="LUV"/>
+            <item value="MMM"/>
+            <item value="MSFT"/>
+            <item value="T"/>
+            <item value="TGT"/>
+            <item value="TXN"/>
+            <item value="WMT"/>
+            <item value="TSLA"/>
           </model>
         </properties>
       </component>
@@ -65,11 +78,11 @@
         </constraints>
         <properties>
           <model>
-            <item value="1 MIN"/>
-            <item value="5 MIN"/>
-            <item value="15 MIN"/>
-            <item value="30 MIN"/>
-            <item value="60 MIN"/>
+            <item value="1min"/>
+            <item value="5min"/>
+            <item value="15min"/>
+            <item value="30min"/>
+            <item value="60min"/>
           </model>
         </properties>
       </component>
@@ -80,11 +93,8 @@
         </constraints>
         <properties>
           <model>
-            <item value="CHOICE 1"/>
-            <item value="CHOICE 2"/>
-            <item value="CHOICE 3"/>
-            <item value="CHOICE 4"/>
-            <item value="CHOICE 5"/>
+            <item value="full"/>
+            <item value="compact"/>
           </model>
         </properties>
       </component>
