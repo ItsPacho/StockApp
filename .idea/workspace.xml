@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="58fed305-24d8-47f2-a848-eed20fdc4196" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/out/production/StockApp/StockForm$1.class" afterPath="$PROJECT_DIR$/out/production/StockApp/StockForm$1.class" />
-      <change beforePath="$PROJECT_DIR$/out/production/StockApp/StockForm$2.class" afterPath="$PROJECT_DIR$/out/production/StockApp/StockForm$2.class" />
-      <change beforePath="$PROJECT_DIR$/out/production/StockApp/StockForm$3.class" afterPath="$PROJECT_DIR$/out/production/StockApp/StockForm$3.class" />
-      <change beforePath="$PROJECT_DIR$/out/production/StockApp/StockForm$4.class" afterPath="$PROJECT_DIR$/out/production/StockApp/StockForm$4.class" />
-      <change beforePath="$PROJECT_DIR$/out/production/StockApp/StockForm$5.class" afterPath="$PROJECT_DIR$/out/production/StockApp/StockForm$5.class" />
-      <change beforePath="$PROJECT_DIR$/out/production/StockApp/StockForm$6.class" afterPath="$PROJECT_DIR$/out/production/StockApp/StockForm$6.class" />
-      <change beforePath="$PROJECT_DIR$/out/production/StockApp/StockForm.class" afterPath="$PROJECT_DIR$/out/production/StockApp/StockForm.class" />
-      <change beforePath="$PROJECT_DIR$/src/StockForm.form" afterPath="$PROJECT_DIR$/src/StockForm.form" />
-      <change beforePath="$PROJECT_DIR$/src/StockForm.java" afterPath="$PROJECT_DIR$/src/StockForm.java" />
+      <change beforePath="$PROJECT_DIR$/StockApp.iml" afterPath="$PROJECT_DIR$/StockApp.iml" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,10 +20,9 @@
       <file leaf-file-name="StockForm.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/StockForm.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="358">
-              <caret line="98" column="57" lean-forward="false" selection-start-line="98" selection-start-column="57" selection-end-line="98" selection-end-column="57" />
+            <state relative-caret-position="102">
+              <caret line="6" column="4" lean-forward="true" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
               <folding>
-                <element signature="imports" expanded="true" />
                 <element signature="e#14100#14101#0" expanded="true" />
                 <element signature="e#14133#14134#0" expanded="true" />
               </folding>
@@ -125,6 +114,12 @@
               <item name="StockApp" type="b2602c69:ProjectViewProjectNode" />
               <item name="StockApp" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="StockApp" type="b2602c69:ProjectViewProjectNode" />
+              <item name="StockApp" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="StockForm" type="e9f4de52:FormNode" />
             </path>
           </expand>
           <select />
@@ -271,7 +266,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -282,7 +276,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22703274" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22703274" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -326,10 +320,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/StockForm.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="358">
-          <caret line="98" column="57" lean-forward="false" selection-start-line="98" selection-start-column="57" selection-end-line="98" selection-end-column="57" />
+        <state relative-caret-position="204">
+          <caret line="90" column="35" lean-forward="true" selection-start-line="90" selection-start-column="35" selection-end-line="90" selection-end-column="35" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#14100#14101#0" expanded="true" />
+            <element signature="e#14133#14134#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/StockApp.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/StockForm.form">
+      <provider selected="true" editor-type-id="ui-designer">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/StockForm.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="4" lean-forward="true" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
+          <folding>
             <element signature="e#14100#14101#0" expanded="true" />
             <element signature="e#14133#14134#0" expanded="true" />
           </folding>
