@@ -9,7 +9,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import org.json.JSONTokener;
@@ -151,56 +153,84 @@ public class StockForm {
                     JSONObject metaObject = newObject.getJSONObject(keyForObject);
                     
                     // SAVE WHAT TO OUTPUT IN AN ARRAY LIST
-                    ArrayList<String> toPrintList = new ArrayList<String>();
+                    ArrayList<StockWithDate> toPrintList = new ArrayList<StockWithDate>();
                     for (String key: metaObject.keySet()) {
                     	
-                    	toPrintList.add(key + " " + metaObject.getJSONObject(key).get("1. open"));
-                    }
-                    
-                    // Sort by date
-                    ArrayList<String> byYearList = new ArrayList<String>();
-                    
-                    System.out.println(toPrintList.size());
-                    
-                    int numberOfTimes = toPrintList.size();
-                    for (int i = 0; i < numberOfTimes; i++) {
+                    	char[] dateToSplit = key.toCharArray();
                     	
-                    	// Get year of first element
-                    	char[] lowestYearArray = toPrintList.get(0).toCharArray();
-                    	int lowestIndex = 0;
-                    	String lowestYearString = lowestYearArray[0] + lowestYearArray[1] +
-                    						lowestYearArray[2] + lowestYearArray[3] + "";
-                    	int lowestYearInt = Integer.parseInt(lowestYearString);
+                    	// YEAR
+                    	String year1 = dateToSplit[0] + "";
+                    	String year2 = dateToSplit[1] + "";
+                    	String year3 = dateToSplit[2] + "";
+                    	String year4 = dateToSplit[3] + "";
+                    	String yearString = year1 + year2 + year3 + year4;
+                    	int yearInt = Integer.parseInt(yearString);
                     	
-                    	for (int j = 0; j < toPrintList.size(); j++) {
+                    	// MONTH
+                    	String month1 = dateToSplit[5] + "";
+                    	String month2 = dateToSplit[6] + "";
+                    	String monthString = month1 + month2;
+                    	int monthInt = Integer.parseInt(monthString);
+                    	
+                    	// DAY
+                    	String day1 = dateToSplit[8] + "";
+                    	String day2 = dateToSplit[9] + "";
+                    	String dayString = day1 + day2;
+                    	int dayInt = Integer.parseInt(dayString);
+                    	
+                    	int hourInt = 0;
+                    	int minuteInt = 0;
+                    	int secondInt = 0;
+                    	if (stateArray[1].equals("TIME_SERIES_INTRADAY")) {
                     		
-                    		char[] lowestYearArrayCompare = toPrintList.get(j).toCharArray();
-                        	String lowestYearStringCompare = lowestYearArrayCompare[0] + lowestYearArrayCompare[1] +
-                        						lowestYearArrayCompare[2] + lowestYearArrayCompare[3] + "";
-                        	int lowestYearIntCompare = Integer.parseInt(lowestYearStringCompare);
-                        	
-                        	if (lowestYearIntCompare < lowestYearInt) {
-                        		lowestIndex = j;
-                        	}
-                        	
+                    		// HOUR
+                    		String hour1 = dateToSplit[11] + "";
+                    		String hour2 = dateToSplit[12] + "";
+                    		String hourString = hour1 + hour2;
+                    		hourInt = Integer.parseInt(hourString);
+                    		
+                    		// MINUTE
+                    		String minute1 = dateToSplit[14] + "";
+                    		String minute2 = dateToSplit[15] + "";
+                    		String minuteString = minute1 + minute2;
+                    		minuteInt = Integer.parseInt(minuteString);
+                    		
+                    		// SECOND
+                    		String second1 = dateToSplit[17] + "";
+                    		String second2 = dateToSplit[18] + "";
+                    		String secondString = second1 + second2;
+                    		secondInt = Integer.parseInt(secondString);
+                    		
                     	}
                     	
-                    	byYearList.add(toPrintList.get(lowestIndex));
-                    	toPrintList.remove(lowestIndex);
+                    	JSONObject stockValueObject = metaObject.getJSONObject(key);
                     	
+                    	StockWithDate newStock = new StockWithDate(yearInt, monthInt, dayInt, hourInt, minuteInt, secondInt, stockValueObject);
+                    	toPrintList.add(newStock);
                     }
                     
-                    System.out.println(byYearList.size());
-                    
-                    
-                    
-                    // SAVE WHAT TO OUTPUT IN A STRING
+                    Collections.sort(toPrintList);
                     String toPrintString = "";
-                    for (int i = 0; i < byYearList.size(); i++) {
-                    	toPrintString = toPrintString + "Date: " + byYearList.get(i) + "\n";
+                    for (int i = 0; i < toPrintList.size(); i++) {
+                    	
+                    	String toChoose = "";
+                    	if (stateArray[0].equals("open")) {
+                    		toChoose = "1. open";
+                    	}
+                    	if (stateArray[0].equals("high")) {
+                    		toChoose = "2. high";
+                    	}
+                    	if (stateArray[0].equals("low")) {
+                    		toChoose = "3. low";
+                    	}
+                    	if (stateArray[0].equals("close")) {
+                    		toChoose = "4. close";
+                    	}
+                    	if (stateArray[0].equals("volume")) {
+                    		toChoose = "5. volume";
+                    	}
+                    	toPrintString = toPrintString + toPrintList.get(i).getDate() + toPrintList.get(i).getData().get(toChoose) + "\n";
                     }
-                    
-        
                     // OUTPUT
                     textArea.append(toPrintString);
 
@@ -212,7 +242,10 @@ public class StockForm {
                     IOError.printStackTrace();
                 } catch (org.json.JSONException JSONError) {
                 	JOptionPane.showMessageDialog(null, "Push The Button Again Please!");
-                }
+                } catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             }
         });
     }
