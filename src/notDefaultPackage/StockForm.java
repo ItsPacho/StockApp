@@ -1,3 +1,4 @@
+package notDefaultPackage;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,7 +16,28 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.json.JSONTokener;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYDataset;
 import org.json.JSONObject;
+
+// JFREECHART
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.block.BlockBorder;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.TextTitle;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 public class StockForm {
  
@@ -26,9 +48,13 @@ public class StockForm {
     private JComboBox timeIntervalComboBox;
     private JComboBox outputComboBox;
     private JButton doQueryButton;
-    private JPanel StockPanel;
+    JPanel StockPanel;
     private JTextArea textArea;
     private JScrollPane textAreaScroll;
+    
+    public boolean disabled = false;
+    public Color lightGray = Color.lightGray;
+    public Color black = Color.black;
 
     public StockForm() {
 
@@ -42,6 +68,7 @@ public class StockForm {
         stateArray[3] = "1min";
         stateArray[4] = "full";
 
+        // sets data for dataComboBox
         dataComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -49,13 +76,25 @@ public class StockForm {
                 stateArray[0] = selectedData;
             }
         });
+        
+        // sets data for timeSeriesComboBox
         timeSeriesComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String selectedTimeSeries = (String) timeSeriesComboBox.getSelectedItem();
                 stateArray[1] = selectedTimeSeries;
+                // Changes the color of timeIntervalComboBox to light gray and disables it
+            if (!selectedTimeSeries.equals("TIME_SERIES_INTRADAY")) {
+            	outputComboBox.setEnabled(false);
+            	timeIntervalComboBox.setEnabled(false);
+             	} else {
+             		outputComboBox.setEnabled(true);
+                	timeIntervalComboBox.setEnabled(true);
+               }
             }
         });
+        
+        // sets data for symbolComboBox
         symbolComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -63,35 +102,42 @@ public class StockForm {
                 stateArray[2] = selectedSymbol;
             }
         });
+        
+        // sets data for timeIntervalComboBox
         timeIntervalComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedInterval = (String) timeIntervalComboBox.getSelectedItem();
-                stateArray[3] = selectedInterval;
+	                String selectedInterval = (String) timeIntervalComboBox.getSelectedItem();
+	                stateArray[3] = selectedInterval;
+            	
             }
         });
+        
+        // sets data for outputComboBox
         outputComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String selectedOutput = (String) outputComboBox.getSelectedItem();
-                stateArray[4] = selectedOutput;
+            		String selectedOutput = (String) outputComboBox.getSelectedItem();
+                    stateArray[4] = selectedOutput;
             }
         });
+        
+        // doqueryButton
         doQueryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                //////////////////////
                 URL url = null;
                 try {
                 	
                 	textArea.setText(null);
+                	
 
                     // DOING THE REQUEST
                     url = new URL("https://www.alphavantage.co/query?function=" + stateArray[1] + "&" +
                             "symbol=" + stateArray[2] + "&" + "interval=" + stateArray[3] +
                             "&" + "outputsize=" + stateArray[4] + "&" + "apikey=XVT9GOFLC4DOQYGY"
                     );
+                    
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
                     con.setRequestMethod("GET");
 
@@ -103,6 +149,7 @@ public class StockForm {
                     while ((inputLine = in.readLine()) != null) {
                         content.append(inputLine + "\n");
                     }
+                    
                     in.close();
                     con.disconnect();
                     String JSONString = content.toString();
@@ -229,57 +276,73 @@ public class StockForm {
                     	if (stateArray[0].equals("volume")) {
                     		toChoose = "5. volume";
                     	}
-                    	toPrintString = toPrintString + toPrintList.get(i).getDate() + toPrintList.get(i).getData().get(toChoose) + "\n";
+                    	toPrintString = toPrintString + toPrintList.get(i).getDate() + " " + toPrintList.get(i).getData().get(toChoose) + "\n";
                     }
                     // OUTPUT
                     textArea.append(toPrintString);
+                    
+                    String[] chartArray = toPrintString.split("\n");
+                    double[] valueArray = new double[chartArray.length];
+                    for (int i = 0; i < chartArray.length; i++) {
+                    	
+                    	String[] eleValStrArray = chartArray[i].split(" ");
+                    	String eleValStr = eleValStrArray[eleValStrArray.length - 1];
+                    	double eleVal = Double.parseDouble(eleValStr);
+        
+        				valueArray[i] = eleVal;
+                    }
+                    
+                    
+                    XYDataset dataset = createDataset(valueArray);
+                    JFreeChart chart = createChart(dataset);
+                    ChartPanel chartPanel = new ChartPanel(chart);
+                    chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+                    
+                    StockPanel.add(chartPanel);
 
-                } catch (MalformedURLException e1) {
-                    e1.printStackTrace();
+                } catch (MalformedURLException malformedError) {
+                    malformedError.printStackTrace();
                 } catch (ProtocolException protocolError) {
                     protocolError.printStackTrace();
                 } catch (IOException IOError) {
                     IOError.printStackTrace();
                 } catch (org.json.JSONException JSONError) {
                 	JOptionPane.showMessageDialog(null, "Push The Button Again Please!");
-                } catch (ParseException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+                } catch (ParseException parseError) {
+					parseError.printStackTrace();
 				}
             }
         });
     }
-
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Stock Analyzer");
-        frame.setContentPane(new StockForm().StockPanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+    
+    //////////////////////////////////// DONE IN MAIN /////////////////////////////////////////////
+    public static void main (String[] args) {
+	    JFrame frame = new JFrame("Stock Analyzer");
+	    frame.setContentPane(new StockForm().StockPanel);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frame.pack();
+	    frame.setLocationRelativeTo(null);
+	    frame.setVisible(true);
     }
 
+
+    ////////////////////////////////// DONE IN VIEW //////////////////////////////////////////////
     {
-// GUI initializer generated by IntelliJ IDEA GUI Designer
-// >>> IMPORTANT!! <<<
-// DO NOT EDIT OR ADD ANY CODE HERE!
         $$$setupUI$$$();
     }
 
-    /**
-     * Method generated by IntelliJ IDEA GUI Designer
-     * >>> IMPORTANT!! <<<
-     * DO NOT edit this method OR call it in your code!
-     *
-     * @noinspection ALL
-     */
     private void $$$setupUI$$$() {
+    	// stockPanel
         StockPanel = new JPanel();
         StockPanel.setLayout(new GridBagLayout());
-        StockPanel.setMinimumSize(new Dimension(522, 552));
+
         StockPanel.setOpaque(false);
-        StockPanel.setPreferredSize(new Dimension(552, 572));
+        
         StockPanel.setRequestFocusEnabled(true);
+        GridBagConstraints gbc;
+        
+        
+        // dataComboBox
         dataComboBox = new JComboBox();
         dataComboBox.setAutoscrolls(false);
         final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
@@ -289,13 +352,14 @@ public class StockForm {
         defaultComboBoxModel1.addElement("close");
         defaultComboBoxModel1.addElement("volume");
         dataComboBox.setModel(defaultComboBoxModel1);
-        GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(dataComboBox, gbc);
+        
+        // timeSeriesComboBox
         timeSeriesComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel2 = new DefaultComboBoxModel();
         defaultComboBoxModel2.addElement("TIME_SERIES_INTRADAY");
@@ -312,6 +376,8 @@ public class StockForm {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(timeSeriesComboBox, gbc);
+        
+        // symbolComboBox
         symbolComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel3 = new DefaultComboBoxModel();
         defaultComboBoxModel3.addElement("A");
@@ -337,6 +403,8 @@ public class StockForm {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(symbolComboBox, gbc);
+        
+        // timeIntervalComboBox
         timeIntervalComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel4 = new DefaultComboBoxModel();
         defaultComboBoxModel4.addElement("1min");
@@ -351,6 +419,8 @@ public class StockForm {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(timeIntervalComboBox, gbc);
+        
+        // outputComboBox
         outputComboBox = new JComboBox();
         final DefaultComboBoxModel defaultComboBoxModel5 = new DefaultComboBoxModel();
         defaultComboBoxModel5.addElement("full");
@@ -362,6 +432,8 @@ public class StockForm {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(outputComboBox, gbc);
+        
+        // doQueryButton
         doQueryButton = new JButton();
         doQueryButton.setPreferredSize(new Dimension(160, 32));
         doQueryButton.setText("Do Query");
@@ -370,6 +442,16 @@ public class StockForm {
         gbc.gridy = 11;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(doQueryButton, gbc);
+        
+        final JLabel label = new JLabel();
+        label.setText("Resize the window after every query");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 12;
+        gbc.anchor = GridBagConstraints.CENTER;
+        StockPanel.add(label, gbc);
+        
+        // dataLabel
         final JLabel label1 = new JLabel();
         label1.setText("Data Series");
         gbc = new GridBagConstraints();
@@ -377,6 +459,8 @@ public class StockForm {
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         StockPanel.add(label1, gbc);
+        
+        // timeLabel
         final JLabel label2 = new JLabel();
         label2.setText("Time Series");
         gbc = new GridBagConstraints();
@@ -384,6 +468,8 @@ public class StockForm {
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
         StockPanel.add(label2, gbc);
+        
+        // symbolLabel
         final JLabel label3 = new JLabel();
         label3.setText("Symbol");
         gbc = new GridBagConstraints();
@@ -391,6 +477,8 @@ public class StockForm {
         gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
         StockPanel.add(label3, gbc);
+        
+        // timeLabel
         final JLabel label4 = new JLabel();
         label4.setText("Time Interval");
         gbc = new GridBagConstraints();
@@ -398,6 +486,8 @@ public class StockForm {
         gbc.gridy = 7;
         gbc.anchor = GridBagConstraints.WEST;
         StockPanel.add(label4, gbc);
+        
+        // outputLabel
         final JLabel label5 = new JLabel();
         label5.setText("Output Size");
         gbc = new GridBagConstraints();
@@ -405,6 +495,8 @@ public class StockForm {
         gbc.gridy = 9;
         gbc.anchor = GridBagConstraints.WEST;
         StockPanel.add(label5, gbc);
+        
+        // Spacers
         final JPanel spacer1 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
@@ -471,6 +563,8 @@ public class StockForm {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.VERTICAL;
         StockPanel.add(spacer11, gbc);
+        
+        // textArea with scrollpane
         textAreaScroll = new JScrollPane();
         textAreaScroll.setAutoscrolls(true);
         textAreaScroll.setHorizontalScrollBarPolicy(31);
@@ -488,44 +582,59 @@ public class StockForm {
         textArea.setRows(5);
         textArea.setWrapStyleWord(false);
         textAreaScroll.setViewportView(textArea);
+                
+    }
+    // JFREECHART
+    private XYDataset createDataset(double[] valueData) {
+
+        XYSeries series = new XYSeries("Stock Data");
+        
+        for (int i = 0; i < valueData.length; i++) {
+        	series.add((i + 1), valueData[i]);
+        }
+
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(series);
+
+        return dataset;
+    }
+    //JFREECHART
+    private JFreeChart createChart(XYDataset dataset) {
+
+        JFreeChart chart = ChartFactory.createXYLineChart(
+                null, 
+                null, 
+                null, 
+                dataset, 
+                PlotOrientation.VERTICAL,
+                true, 
+                true, 
+                false 
+        );
+
+        XYPlot plot = chart.getXYPlot();
+
+        XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+        renderer.setSeriesPaint(0, Color.RED);
+        renderer.setSeriesStroke(0, new BasicStroke(2.0f));
+
+        plot.setRenderer(renderer);
+        plot.setBackgroundPaint(Color.white);
+
+        plot.setRangeGridlinesVisible(true);
+        plot.setRangeGridlinePaint(Color.BLACK);
+
+        plot.setDomainGridlinesVisible(true);
+        plot.setDomainGridlinePaint(Color.BLACK);
+
+        chart.getLegend().setFrame(BlockBorder.NONE);
+
+        return chart;
+
     }
 
-    /**
-     * @noinspection ALL
-     */
     public JComponent $$$getRootComponent$$$() {
         return StockPanel;
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
