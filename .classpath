@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="lib/jcommon-1.0.23.jar"/>
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.19.jar"/>
 	<classpathentry kind="lib" path="lib/ini4j-0.5.4/ini4j-0.5.4.jar"/>
+	<classpathentry kind="lib" path="lib/xchart-3.5.1/xchart-3.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

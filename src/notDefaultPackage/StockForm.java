@@ -22,6 +22,9 @@ import java.util.Date;
 import java.util.Iterator;
 
 import org.json.JSONTokener;
+import org.knowm.xchart.QuickChart;
+import org.knowm.xchart.XChartPanel;
+import org.knowm.xchart.XYChart;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYDataset;
@@ -60,12 +63,15 @@ public class StockForm {
     private JComboBox timeIntervalComboBox;
     private JComboBox outputComboBox;
     private JButton doQueryButton;
+    private JButton PearsonButton;
     JPanel StockPanel;
     private JTextArea textArea;
     private JScrollPane textAreaScroll;
     private JTextField textField;
     private JTextField textField2;
     private JTextField textField3;
+    private JTextField textField4;
+    
     
     public boolean disabled = false;
     public Color lightGray = Color.lightGray;
@@ -83,6 +89,95 @@ public class StockForm {
     // START AND STOP DATE
     String startDatexx = "";
     String stopDatexx = "";
+    
+    // ArrayLists FOR DOUBLE SYMBOLS
+    ArrayList<String> symbolListValues1 = new ArrayList<String>();
+    ArrayList<String> symbolListValues2 = new ArrayList<String>();
+    
+    // IF BOTH SYMBOLS CHOSEN
+    boolean bothSymbols = false;
+    
+    public double calculatePearson(ArrayList<String> vals1, ArrayList<String> vals2) {
+    	double[] symbolListArray1 = new double[vals1.size()];
+    	double[] symbolListArray2 = new double[vals2.size()];
+    	
+    	for (int i = 0; i < vals1.size(); i++) {
+    		double valel1 = Double.parseDouble(vals1.get(i));
+    		double valel2 = Double.parseDouble(vals2.get(i));
+    		
+    		symbolListArray1[i] = valel1;
+    		symbolListArray2[i] = valel2;
+    	}
+    	
+    	// CALCULATING SYMBOL1 MEAN
+    	double val1sum = 0;
+    	for (int i = 0; i < symbolListArray1.length; i++) {
+    		val1sum = val1sum + symbolListArray1[i];
+    	}
+    	double val1mean = val1sum / symbolListArray1.length;
+    	//////////////////////////////////////////////////////////
+    	System.out.println("val1mean: " + val1mean);
+    	
+    	// CALCULATING SYMBOL2 MEAN
+    	double val2sum = 0;
+    	for (int i = 0; i < symbolListArray2.length; i++) {
+    		val2sum = val2sum + symbolListArray2[i];
+    	}
+    	double val2mean = val2sum / symbolListArray2.length;
+    	///////////////////////////////////////////////////////////
+    	System.out.println("val12mean: " + val2mean);
+    	
+    	// CALCULATING COVARSUM
+    	double covarSum = 0;
+    	for (int i = 0; i < symbolListArray1.length; i++) {
+    		
+    		double covarel1 = symbolListArray1[i] - val1mean;
+    		double covarel2 = symbolListArray2[i] - val2mean;
+    		
+    		double covarProd = covarel1 * covarel2;
+    		covarSum = covarSum + covarProd;
+    		
+    	}
+    	////////////////////////////////////////////////////////////
+    	System.out.println("covarSum: " + covarSum);
+    	
+    	// CALCULATING COVARIANCE
+    	double covariance = covarSum / (symbolListArray1.length - 1);
+    	////////////////////////////////////////////////////////////
+    	System.out.println("covariance: " + covariance );
+    	
+    	// CALCULATING STANDARD DEVIATION OF SYMBOL 1
+    	double stdSum1 = 0;
+    	for (int i = 0; i < symbolListArray1.length; i++) {
+    		
+    		double stdel1 = Math.pow((symbolListArray1[i] - val1mean), 2);
+    		stdSum1 = stdSum1 + stdel1;
+    		
+    	}
+    	double stdDev1 = Math.sqrt(stdSum1 / (symbolListArray1.length));
+    	///////////////////////////////////////////////////////////////
+    	System.out.println("stdDev1: " + stdDev1);
+    	
+    	// CALCULATING STANDARD DEVIATION OF SYMBOL 2
+    	double stdSum2 = 0;
+    	for (int i = 0; i < symbolListArray2.length; i++) {
+    		
+    		double stdel2 = Math.pow((symbolListArray2[i] - val2mean), 2);
+    		stdSum2 = stdSum2 + stdel2;
+    		
+    	}
+    	double stdDev2 = Math.sqrt(stdSum2 / (symbolListArray2.length));
+    	/////////////////////////////////////////////////////////////////
+    	System.out.println("stdDev2: " + stdDev2);
+    	
+    	
+    	/////////////////////////////////////////////////////////////////
+    	System.out.println("PEARSONS: " + covariance / (stdDev1 * stdDev2));
+    	return covariance / (stdDev1 * stdDev2);
+    	
+    	
+    }
+    
     
     
     public void getDataFromIni() throws InvalidFileFormatException, IOException {
@@ -147,6 +242,7 @@ public class StockForm {
         stateArray[5] = apiKeyxx;
         stateArray[6] = "";
         
+        
         // get start date
         textField2.addFocusListener(new FocusListener() {
 
@@ -194,6 +290,24 @@ public class StockForm {
 				String selectedData = (String) textField.getText();
         		stateArray[5] = selectedData;
 			}
+        });
+        
+        
+        // PEARSON BUTTON
+        PearsonButton.addActionListener(new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent e) {
+        		
+        		if (bothSymbols) {
+        			
+        			
+        			double pearsonValue = calculatePearson(symbolListValues1, symbolListValues2);
+        			String pearsonValueString = pearsonValue + "";
+        			textField4.setText(pearsonValueString);
+        			
+        		}
+        		
+        	}
         });
 
         // sets data for dataComboBox
@@ -270,14 +384,16 @@ public class StockForm {
                 JSONObject newObject1 = null;
                 JSONObject newObject2 = null;
                 
-                boolean bothSymbols = false;
                 try {
                 	
                 	textArea.setText(null);
+                	textField4.setText(null);
                 	
                 	
                 	// IF ONLY SYMBOL 1 IS CHOSEN
                 	if (!stateArray[2].equals("") && stateArray[6].equals("")) {
+                		
+                		bothSymbols = false;
                 		
                 		url = new URL("https://www.alphavantage.co/query?function=" + stateArray[1] + "&" +
                                 "symbol=" + stateArray[2] + "&" + "interval=" + stateArray[3] +
@@ -286,6 +402,8 @@ public class StockForm {
                 		
                 	// IF ONLY SYMBOL 2 IS CHOSEN
                 	}else if (stateArray[2].equals("") && !stateArray[6].equals("")) {
+                		
+                		bothSymbols = false;
                 		
                 		url = new URL("https://www.alphavantage.co/query?function=" + stateArray[1] + "&" +
                                 "symbol=" + stateArray[6] + "&" + "interval=" + stateArray[3] +
@@ -794,7 +912,22 @@ public class StockForm {
                         		toChoose = "5. volume";
                         	}
                         	toPrintString = toPrintString + stopDateList1.get(i).getDate() + " " + symbolToPrint1 + " " + stopDateList1.get(i).getData().get(toChoose) +
-                        			 "      " + symbolToPrint2 + " " + stopDateList2.get(i).getData().getDouble(toChoose) + "\n";
+                        			 " " + symbolToPrint2 + " " + stopDateList2.get(i).getData().getDouble(toChoose) + "\n";
+                        }
+                        
+                        String[] valueStringArrayX = toPrintString.split("\n");
+                        
+                        symbolListValues1.clear();
+                        symbolListValues2.clear();
+                        for (int i = 0; i < valueStringArrayX.length; i++) {
+                        	
+                        	String[] valStrArr = valueStringArrayX[i].split(" ");
+                        	String valEl1 = valStrArr[valStrArr.length - 3];
+                        	String valEl2 = valStrArr[valStrArr.length - 1];
+                        	
+                        	symbolListValues1.add(valEl1);
+                        	symbolListValues2.add(valEl2);
+                        	
                         }
                     }
                     
@@ -802,24 +935,39 @@ public class StockForm {
                     // OUTPUT
                     textArea.append(toPrintString);
                     
-                    String[] chartArray = toPrintString.split("\n");
-                    double[] valueArray = new double[chartArray.length];
-                    for (int i = 0; i < chartArray.length; i++) {
+                    if (!bothSymbols) {
+                    	String[] chartArray = toPrintString.split("\n");
+                        double[] valueArray = new double[chartArray.length];
+                        for (int i = 0; i < chartArray.length; i++) {
+                        	
+                        	String[] eleValStrArray = chartArray[i].split(" ");
+                        	String eleValStr = eleValStrArray[eleValStrArray.length - 1];
+                        	double eleVal = Double.parseDouble(eleValStr);
+            
+            				valueArray[i] = eleVal;
+                        }
+                        
+                        // JFREECHART
+                        XYDataset dataset = createDataset(valueArray);
+                        JFreeChart chart = createChart(dataset);
+                        ChartPanel chartPanel = new ChartPanel(chart);
+                        chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+                        chartPanel.setPreferredSize(new Dimension(400,400));
+                        
+                        StockPanel.add(chartPanel);
+                    }
+                    
+                    if (bothSymbols) {
                     	
-                    	String[] eleValStrArray = chartArray[i].split(" ");
-                    	String eleValStr = eleValStrArray[eleValStrArray.length - 1];
-                    	double eleVal = Double.parseDouble(eleValStr);
-        
-        				valueArray[i] = eleVal;
+                    	
+                    	
                     }
                     
                     
-                    XYDataset dataset = createDataset(valueArray);
-                    JFreeChart chart = createChart(dataset);
-                    ChartPanel chartPanel = new ChartPanel(chart);
-                    chartPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
                     
-                    StockPanel.add(chartPanel);
+                    
+                    
+                    
 
                 } catch (MalformedURLException malformedError) {
                     malformedError.printStackTrace();
@@ -845,7 +993,7 @@ public class StockForm {
 	    JFrame frame = new JFrame("Stock Analyzer");
 	    frame.setContentPane(new StockForm().StockPanel);
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    frame.pack();
+	    frame.pack();	
 	    frame.setLocationRelativeTo(null);
 	    frame.setVisible(true);
     }
@@ -861,15 +1009,17 @@ public class StockForm {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        $$$setupUI$$$();
+    	$$$setupUI$$$();
     }
+    
     
 
     private void $$$setupUI$$$() {
+
     	// stockPanel
         StockPanel = new JPanel();
         StockPanel.setLayout(new GridBagLayout());
-
+        
         StockPanel.setOpaque(false);
         
         StockPanel.setRequestFocusEnabled(true);
@@ -908,6 +1058,17 @@ public class StockForm {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(textField3, gbc);
+        
+     // Stop date textField4
+        textField4 = new JTextField();
+        textField4.setOpaque(false);
+        textField4.setPreferredSize(new Dimension(400, 21));
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 22;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        StockPanel.add(textField4, gbc);
         
         
         // dataComboBox
@@ -1002,7 +1163,7 @@ public class StockForm {
         
         // doQueryButton
         doQueryButton = new JButton();
-        doQueryButton.setPreferredSize(new Dimension(160, 32));
+        doQueryButton.setPreferredSize(new Dimension(160, 22));
         doQueryButton.setText("Do Query");
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
@@ -1010,12 +1171,22 @@ public class StockForm {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         StockPanel.add(doQueryButton, gbc);
         
+     // Pearson correlation Button
+        PearsonButton = new JButton();
+        PearsonButton.setPreferredSize(new Dimension(0, 22));
+        PearsonButton.setText("Pearson Correlation");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 22;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        StockPanel.add(PearsonButton, gbc);
+        
         // Resize window label
         final JLabel label = new JLabel();
         label.setText("Resize the window after every query");
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 22;
+        gbc.gridy = 20;
         gbc.anchor = GridBagConstraints.CENTER;
         StockPanel.add(label, gbc);
         
@@ -1227,7 +1398,7 @@ public class StockForm {
         textAreaScroll.setWheelScrollingEnabled(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 3;
-        gbc.gridy = 22;
+        gbc.gridy = 24;
         gbc.fill = GridBagConstraints.BOTH;
         StockPanel.add(textAreaScroll, gbc);
         textArea = new JTextArea();
@@ -1236,6 +1407,8 @@ public class StockForm {
         textArea.setRows(5);
         textArea.setWrapStyleWord(false);
         textAreaScroll.setViewportView(textArea);
+        
+
                 
     }
     // JFREECHART
@@ -1252,6 +1425,8 @@ public class StockForm {
 
         return dataset;
     }
+    
+    
     //JFREECHART
     private JFreeChart createChart(XYDataset dataset) {
 
@@ -1286,6 +1461,8 @@ public class StockForm {
         return chart;
 
     }
+    
+    
 
     public JComponent $$$getRootComponent$$$() {
         return StockPanel;
